@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Atrapa el emoji 🍎</title>
+<style>
+  body {
+    margin: 0;
+    text-align: center;
+    font-family: sans-serif;
+  }
+
+  h2 {
+    margin: 10px;
+  }
+
+  #tablero {
+    border: 2px solid black;
+    height: 70vh;
+    margin: 10px;
+    position: relative;
+    overflow: hidden;
+    background-color: aqua;
+  }
+
+  span {
+    position: absolute;
+    font-size: 40px;
+    cursor: pointer;
+  }
+
+  button {
+    background-color: white;
+    color: teal;
+    border: 2px solid teal;
+    border-radius: 10px;
+    padding: 10px 20px;
+    font-size: 18px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+
+  button:hover {
+    background-color: teal;
+    color: white;
+  }
+</style>
+</head>
+<body>
+
+<h2>Puntaje: <span id="puntaje">0</span></h2>
+<h2>Tiempo: <span id="tiempo">10</span></h2>
+<button id="inicio">Comenzar</button>
+
+<div id="tablero"></div>
+
+<script>
+  // Lista de emojis para usar
+  const emojis = ["🍎", "🍒", "🍓", "🍉", "🍇"];
+  let puntos = 0;
+  let tiempo = 10;
+  let intervalo;
+
+  const tablero = document.getElementById("tablero");
+  const puntaje = document.getElementById("puntaje");
+  const tiempoTxt = document.getElementById("tiempo");
+  const btnInicio = document.getElementById("inicio");
+
+  // Función para crear un emoji en posición aleatoria
+  function crearEmoji() {
+    const emoji = document.createElement("span");
+    emoji.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+    emoji.style.left = Math.random() * (tablero.clientWidth - 40) + "px";
+    emoji.style.top = Math.random() * (tablero.clientHeight - 40) + "px";
+
+    // Al hacer clic, suma puntos y crea otro emoji
+    emoji.onclick = function() {
+      puntos += 100;
+      puntaje.textContent = puntos;
+      emoji.remove();
+      crearEmoji();
+    }
+
+    tablero.appendChild(emoji);
+  }
+
+  // Función para iniciar el juego
+  function iniciarJuego() {
+    puntos = 0;
+    tiempo = 10;
+    puntaje.textContent = 0;
+    tiempoTxt.textContent = tiempo;
+    tablero.innerHTML = ""; // limpia el tablero
+    btnInicio.style.display = "none"; // oculta el botón
+    crearEmoji();
+
+    // Temporizador de 1 segundo
+    intervalo = setInterval(() => {
+      tiempo--;
+      tiempoTxt.textContent = tiempo;
+      if (tiempo <= 0) {
+        clearInterval(intervalo);
+        tablero.innerHTML = `<h2>🎉 Juego terminado 🎉<br>Puntuación: ${puntos}</h2>`;
+        btnInicio.textContent = "Jugar otra vez";
+        btnInicio.style.display = "inline-block";
+      }
+    }, 1000);
+  }
+
+  btnInicio.onclick = iniciarJuego;
+</script>
+
+</body>
+</html>
