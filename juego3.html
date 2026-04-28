@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simon Dice</title>
+    <style>
+        body{
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        button{
+            background-color: lightgreen;
+            border: green solid 2px;
+            border-radius: 5px;
+            font-size: 20px;
+            margin: 10px;
+            color: darkgreen;
+            padding: 7px;
+            cursor: pointer;
+        }
+
+        button:hover{
+            background-color: green;
+            color: lightgreen;
+        }
+
+        .contenedor{
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .cuadro{
+            margin: 10px;
+            width: 100px;
+            height: 100px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .azul{
+            background-color: blue;
+            border: solid 1px blue;
+        }
+        .rojo{
+            background-color: red;
+            border: solid 1px red;
+        }
+        .verde{
+            background-color: green;
+            border: solid 1px green;
+        }
+        .amarillo{
+            background-color: yellow;
+            border: solid 1px yellow;
+        }
+
+        .azul:hover{
+            background-color: darkblue;
+        }
+        .rojo:hover{
+            background-color: darkred;
+        }
+        .verde:hover{
+            background-color: darkgreen;
+        }
+        .amarillo:hover{
+            background-color: darkgoldenrod;
+        }
+        
+
+    </style>
+</head>
+<body>
+    <h1>Nivel: <span id="nivel">0</span></h1>
+    <div class="contenedor">
+        <table id="tablero">
+            <tr>
+                <td class="cuadro azul" id="c1" onclick="presionar(1)"></td>
+                <td class="cuadro rojo" id="c2" onclick="presionar(2)"></td>
+            </tr>
+            <tr>
+                <td class="cuadro verde" id="c3" onclick="presionar(3)"></td>
+                <td class="cuadro amarillo" id="c4" onclick="presionar(4)"></td>
+            </tr>
+        </table>
+        <button id="comenzar" onclick="comenzar(this)">comenzar</button>
+    </div>
+
+    <script>
+        let nivel = 0;
+        let movimientos = [];
+        let movimientos_hechos = 0;
+        let colores_iluminados = ["#66b3ff", "#ff6666", "#66ff99", "#ffff99"];
+        let button_comenzar = document.getElementById("comenzar");
+
+        let nuevo_movimiento = () =>{
+            x = Math.floor(Math.random()*4)+1;
+            movimientos.push(x);
+        }
+
+        let mostrar_movimientos = async () => {
+            for (const n of movimientos) {
+                iluminar(n);
+                await esperar(500);
+                apagar(n);
+                await esperar(100);
+            };
+        }
+        let esperar = (ms) => {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        let iluminar = (n) => {
+            document.getElementById("c"+n).style.backgroundColor = colores_iluminados[n-1];
+            document.getElementById("c"+n).style.border = "solid black 1px";
+        }
+        let apagar = (n) => {
+            document.getElementById("c"+n).style= "";
+        }
+
+        let siguiente_nivel = () => {
+            nivel++;
+            document.getElementById("nivel").textContent = nivel;
+            nuevo_movimiento();
+            mostrar_movimientos();
+        }
+
+        let comenzar = (e) => {
+            movimientos = [];
+            button_comenzar.style.display="None";
+            siguiente_nivel();
+        }
+
+        let presionar = async (n) => {
+            iluminar(n);
+            await esperar(200);
+            apagar(n);
+            if (n != movimientos[movimientos_hechos++]){
+                game_over();
+            }
+            if (movimientos_hechos == movimientos.length){
+                movimientos_hechos = 0;
+                await esperar(500);
+                siguiente_nivel();
+            }
+        }
+
+        let game_over = () => {
+            movimientos_hechos = 0;
+            movimientos = [];
+            alert("perdiste :(");
+            button_comenzar.textContent = "Jugar de nuevo";
+            button_comenzar.style.display = "block"
+        }
+    </script>
+</body>
+</html>
