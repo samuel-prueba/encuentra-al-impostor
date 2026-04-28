@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>El impostor</title>
+    <style>
+        body{
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        .contenedor{
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+        td{
+            cursor: pointer;
+            font-size: 80px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Nivel <span id="nivel">0</span></h1>
+    <h2>Restante: <span id="tiempo">0</span></h2>
+    <div class="contenedor">
+        <table id="tablero">
+            <tr><td>Dale click al impostor</td></tr>
+            <tr><td onclick="siguiente_nivel()">
+                Comenzar
+            </td></tr>
+        </table>
+    </div>
+    <script>
+        let nivel = 0;
+        const emojis_parecidos = [
+            ["😀","😃","😄","😁","😆","😅","😇"],
+            ["🙂","🙃","😐","😑","😶","😏","😒"],
+            ["😴","😪","😌","😔","😕","😞"],
+            ["😠","😤","😾","😣","😖"],
+            ["🐶","🐕","🦮","🐕‍🦺"],
+            ["🐱","😺","😸","😹","😻","😼","😽"],
+            ["🐻","🐨","🐼","🦊","🐮"],
+            ["🐢","🦎","🐍","🐊"],
+            ["🍌","🍋","🥭","🌽"],
+            ["💻","🖥️"],
+            ["🖱️","⌨️","🖨️"],
+            ["🍔","🥪","🌭"],
+            ["🚗","🚕","🚙","🚓","🚑","🚒"],
+        ];
+        const tablero = document.getElementById("tablero");
+        const tiempo = document.getElementById("tiempo");
+        const txt_nivel = document.getElementById("nivel");
+        let intervalo; 
+        let celda_impostor;
+        let crear_nivel = () => {
+            let cantidad = Math.floor((nivel/3)+2);
+            let impostor = Math.floor(Math.random()*(cantidad**2));
+            let n = Math.floor(Math.random()*emojis_parecidos.length)
+            let seleccion = emojis_parecidos[n];
+            let shuffled = [...seleccion].sort(() => Math.random()-0.5);
+            for(let i = 0; i<cantidad; i++){
+                let fila = document.createElement("tr");
+                for(let j = 0; j < cantidad; j++){
+                    let celda = document.createElement("td");
+                    if (i*cantidad+j == impostor){
+                        celda.textContent = shuffled[1];
+                        celda_impostor = celda;
+                        celda.onclick = () => {
+                            siguiente_nivel();
+                        }
+                    }
+                    else{
+                        celda.textContent = shuffled[0];
+                        celda.onclick = () => {
+                            game_over();
+                        }
+                    }
+                    fila.appendChild(celda);
+                }
+                tablero.appendChild(fila);
+            }
+        }
+        let game_over = () => {
+            clearInterval(intervalo);
+            celda_impostor.style.border = "solid red 2px";
+            setTimeout(() => {
+                alert("GAME OVER");
+                tablero.textContent = "";
+                tr = document.createElement("tr");
+                td = document.createElement("td");
+                td.textContent = "Puntuación: "+nivel;
+                tr.appendChild(td);
+                tablero.appendChild(tr);
+                tr = document.createElement("tr");
+                td = document.createElement("td");
+                td.textContent = "Reintentar";
+                td.onclick = () => {siguiente_nivel()};
+                tr.appendChild(td);
+                tablero.appendChild(tr);
+                nivel = 0;
+            }, 100);
+        }
+        let siguiente_nivel = () => {
+            clearInterval(intervalo);
+            tablero.textContent = "";
+            nivel++;
+            window.removeEventListener('resize', ajustarTexto);
+            crear_nivel();
+            txt_nivel.textContent = nivel;
+            ajustarTexto();
+            window.addEventListener('resize', ajustarTexto);
+            let inicio = 3;
+            tiempo.textContent = inicio; 
+            intervalo = setInterval(() => {
+                inicio--;
+                tiempo.textContent = inicio;
+                if (inicio == 0){
+                    game_over();
+                }
+            }, 1000)
+        }
+        let ajustarTexto = () => {
+            const contenedor = document.querySelector('.contenedor');
+            const tabla = contenedor.querySelector('table');
+            const celdas = tabla.querySelectorAll('td, th');
+            let size = 80;
+            
+            while ((tabla.scrollHeight > contenedor.clientHeight && size > 8) || (tabla.scrollWidth > contenedor.clientWidth && size > 8)) {
+                size -= 1;
+                celdas.forEach(td => td.style.fontSize = size + 'px');
+            }
+        }
+    </script>
+</body>
+</html>
