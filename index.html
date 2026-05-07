@@ -57,7 +57,7 @@
         const tiempo = document.getElementById("tiempo");
         const txt_nivel = document.getElementById("nivel");
         let intervalo; 
-        let game_over = false;
+        let t_game_over = false;
         let celda_impostor;
         let crear_nivel = () => {
             let cantidad = Math.floor((nivel/3)+2);
@@ -90,7 +90,7 @@
         let game_over = () => {
             clearInterval(intervalo);
             celda_impostor.style.border = "solid red 2px";
-            game_over = true;
+            t_game_over = true;
             setTimeout(() => {
                 alert("GAME OVER");
                 tablero.textContent = "";
@@ -110,8 +110,7 @@
             }, 3000);
         }
         let siguiente_nivel = () => {
-            console.log(game_over);
-            if (game_over){
+            if (t_game_over){
                 return;
             }
             clearInterval(intervalo);
